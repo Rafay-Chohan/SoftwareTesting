@@ -57,16 +57,16 @@ public class LoginApp extends JFrame {
         }
     }
 
-    private String authenticateUser(String email) {
+    private static String authenticateUser(String email) {
         String userName = null;
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT name FROM User WHERE Email = ?";
+            String query = "SELECT name FROM Users WHERE Email = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                userName = rs.getString("Name");
+                userName = rs.getString("Names");
             }
             rs.close();
             stmt.close();
@@ -81,5 +81,9 @@ public class LoginApp extends JFrame {
             LoginApp loginApp = new LoginApp();
             loginApp.setVisible(true);
         });
+    }
+    public static Boolean isvalidLogin(String email,String password)
+    {
+        return !Objects.equals(authenticateUser(email,password), null);
     }
 }
