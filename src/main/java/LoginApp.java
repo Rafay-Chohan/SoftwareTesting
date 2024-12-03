@@ -6,13 +6,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Objects;
 
 public class LoginApp extends JFrame {
     private JTextField emailField;
     private JPasswordField passwordField;
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/softwaretesting";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "12345678";
+    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=master;encrypt=false";
+    private static final String DB_USER = "temp";
+    private static final String DB_PASSWORD = "test123";
 
     public LoginApp() {
         setTitle("Login Screen");
@@ -56,16 +57,16 @@ public class LoginApp extends JFrame {
         }
     }
 
-    private String authenticateUser(String email) {
+    private static String authenticateUser(String email) {
         String userName = null;
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String query = "SELECT name FROM User WHERE Email = ?";
+            String query = "SELECT names FROM Users WHERE Email = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                userName = rs.getString("Name");
+                userName = rs.getString("Names");
             }
             rs.close();
             stmt.close();
@@ -80,5 +81,30 @@ public class LoginApp extends JFrame {
             LoginApp loginApp = new LoginApp();
             loginApp.setVisible(true);
         });
+    }
+
+    private static String FixedAuthenticateUser(String email,String password) {
+        String userName = null;
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT Names,Passwords FROM Users WHERE Email = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String dbpassword = rs.getString("Passwords");
+                if(Objects.equals(password, dbpassword))
+                    userName=rs.getString("Names");
+            }
+            rs.close();
+            stmt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userName;
+    }
+    public static Boolean isvalidLogin(String email,String password)
+    {
+        return !Objects.equals(FixedAuthenticateUser(email,password), null);
     }
 }
