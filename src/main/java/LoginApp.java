@@ -11,9 +11,10 @@ import java.util.Objects;
 public class LoginApp extends JFrame {
     private JTextField emailField;
     private JPasswordField passwordField;
-    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=master;encrypt=false";
-    private static final String DB_USER = "temp";
-    private static final String DB_PASSWORD = "test123";
+    private static final String DB_URL = System.getenv("DB_URL");
+    private static final String DB_USER = System.getenv("DB_USER");
+    private static final String DB_PASSWORD = System.getenv("DB_PASSWORD");
+
 
     public LoginApp() {
         setTitle("Login Screen");
