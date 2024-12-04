@@ -9,20 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      mssql:
-        image: mcr.microsoft.com/mssql/server:2019-latest
-        ports:
-          - 1433:1433
-        options: >-
-          --health-cmd "opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'Strong@Password1' -Q 'SELECT 1'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
-        env:
-          ACCEPT_EULA: Y
-          SA_PASSWORD: Strong@Password1
-          MSSQL_PID: Express
 
     steps:
       - name: Checkout code
@@ -34,18 +20,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Wait for SQL Server to be ready
-        run: sleep 30
-
-      - name: Initialize Database
-        run: |
-          /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'Strong@Password1' -Q "CREATE DATABASE master;"
-          /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P 'Strong@Password1' -d master -i initialize.sql
-
       - name: Run tests
         env:
           DB_URL: "jdbc:sqlserver://localhost:1433;databaseName=master;encrypt=false"
-          DB_USER: "SA"
-          DB_PASSWORD: "Strong@Password1"
+          DB_USER: "temp"
+          DB_PASSWORD: "temp1234"
         run: |
           mvn test
